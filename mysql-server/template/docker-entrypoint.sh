@@ -95,10 +95,18 @@ if [ "$1" = 'mysqld' ]; then
 		# will be restarted using the user's option.
 
 		echo '[Entrypoint] Initializing database'
-		"$@" --user=$MYSQLD_USER --initialize-insecure  --default-time-zone=+00:00
+		if [ -n "%%DEBUG_FLAGS%%" ]; then
+			"$@" --user=$MYSQLD_USER --initialize-insecure --default-time-zone=+00:00 %%DEBUG_FLAGS%%
+		else
+			"$@" --user=$MYSQLD_USER --initialize-insecure  --default-time-zone=+00:00
+		fi
 
 		echo '[Entrypoint] Database initialized'
-		"$@" --user=$MYSQLD_USER --daemonize --skip-networking --socket="$SOCKET" --default-time-zone=+00:00
+		if [ -n "%%DEBUG_FLAGS%%" ]; then
+			"$@" --user=$MYSQLD_USER --daemonize --skip-networking --socket="$SOCKET" --default-time-zone=+00:00 %%DEBUG_FLAGS%%
+		else
+			"$@" --user=$MYSQLD_USER --daemonize --skip-networking --socket="$SOCKET" --default-time-zone=+00:00
+		fi
 
 		# To avoid using password on commandline, put it in a temporary file.
 		# The file is only populated when and if the root password is set.
@@ -224,7 +232,12 @@ EOF
 	fi
 	# 4th value of /proc/$pid/stat is the ppid, same as getppid()
 	export MYSQLD_PARENT_PID=$(cat /proc/$$/stat|cut -d\  -f4)
-	exec "$@" --user=$MYSQLD_USER
+	# Add debug flags if specified (for debug builds)
+	if [ -n "%%DEBUG_FLAGS%%" ]; then
+		exec "$@" --user=$MYSQLD_USER %%DEBUG_FLAGS%%
+	else
+		exec "$@" --user=$MYSQLD_USER
+	fi
 else
 	exec "$@"
 fi

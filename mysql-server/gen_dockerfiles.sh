@@ -32,6 +32,7 @@ MYSQL_VERSION=""; [ -n "$8" ] && MYSQL_VERSION=$8
 SHELL_VERSION=""; [ -n "$9" ] && SHELL_VERSION=$9
 MYSQL_CONFIG_PKG_MINIMAL="mysql-community-minimal-release"; [ -n "${10}" ] && MYSQL_CONFIG_PKG_MINIMAL=${10}
 MYSQL_CONFIG_PKG="mysql80-community-release"; [ -n "${11}" ] && MYSQL_CONFIG_PKG=${11}
+DEBUG_FLAGS=""; [ -n "${12}" ] && DEBUG_FLAGS=${12}
 
 # Get the Major Version
 MAJOR_VERSION=${MYSQL_VERSION%.*}
@@ -102,6 +103,7 @@ FULL_SERVER_VERSION="$MYSQL_VERSION-${IMAGE_VERSION}"
 sed 's#%%PASSWORDSET%%#'"${PASSWORDSET}"'#g' template/docker-entrypoint.sh > tmpfile
 sed -i 's#%%FULL_SERVER_VERSION%%#'"${FULL_SERVER_VERSION}"'#g' tmpfile
 sed -i 's#%%VALIDATE_CONFIG%%#'"${VALIDATE_CONFIG}"'#g' tmpfile
+sed -i 's#%%DEBUG_FLAGS%%#'"${DEBUG_FLAGS}"'#g' tmpfile
 mv tmpfile ${MAJOR_VERSION}/docker-entrypoint.sh
 chmod +x ${MAJOR_VERSION}/docker-entrypoint.sh
 
